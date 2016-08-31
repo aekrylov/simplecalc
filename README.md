@@ -1,19 +1,25 @@
-simplecalc - a simple calculator
----
+#simplecalc - a simple calculator
 
+Supports complex expressions with +, -, *, / operations and brackets.
 
-How to build:
+###Usage:
+    
+    ./simplecalc
+    >19.7   +( 3,25/2)
+
+###How to build:
 
     cd build
     cmake ..
     make
     
-How to test (GTest required):
+###How to test (GTest required):
 
     make
     make test
     
-Usage:
-    
-    ./simplecalc
+Or
+
+    make simplecalc_test
+    ./test/simplecalc_test
     

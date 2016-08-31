@@ -9,41 +9,37 @@
 #include "../include/Calculator.h"
 
 double Calculator::calculate(const char *str, const char **end) {
-    std::vector<std::string> rpn;
-    std::stack<std::string> ops;
+    std::deque<std::string> rpn;
+    std::stack<char> ops;
 
-    for (const char* c = str; *c != '\0'; c++) {
-        if(*c == '(') {
-            rpn.push_back(std::to_string(calculate(c+1, &c)));
+    for (const char *c = str; *c != '\0'; c++) {
+        if (*c == '(') {
+            rpn.push_back(std::to_string(calculate(c + 1, &c)));
 
-        }
-        else if(*c == ')') {
-            if(end == 0) { //end pointer not passed
+        } else if (*c == ')') {
+            if (end == 0) { //end pointer not passed
                 throw std::runtime_error("brackets imbalance");
             }
             *end = c;
             break;
-        }
-        else if(isdigit(*c)) { //beginning of a number
+        } else if (isdigit(*c)) { //beginning of a number
             double number = ::strtod(c, (char **) &c);
             c--;
             rpn.push_back(std::to_string(number));
 
-        }
-        else {
+        } else {
             int p = priority(*c);
-            while(!ops.empty() && priority(ops.top()[0]) >= p) {
-                rpn.push_back(ops.top());
+            while (!ops.empty() && priority(ops.top()) >= p) {
+                rpn.push_back(std::string(1, ops.top()));
                 ops.pop();
             }
 
-            ops.push(std::string(1, *c));
-
+            ops.push(*c);
         }
 
     }
     while (!ops.empty()) {
-        rpn.push_back(ops.top());
+        rpn.push_back(std::string(1, ops.top()));
         ops.pop();
     }
 
@@ -52,8 +48,8 @@ double Calculator::calculate(const char *str, const char **end) {
     std::stack<double> numbers;
     numbers.push(0); //handling initial minus sign
 
-    for(std::string token: rpn) {
-        if(isdigit(token[0]) || token.length() > 1) {
+    for (std::string token: rpn) {
+        if (isdigit(token[0]) || token.length() > 1) {
             numbers.push(stod(token));
         } else {
             double op2 = numbers.top();
@@ -69,14 +65,14 @@ double Calculator::calculate(const char *str, const char **end) {
 
 }
 
-char* Calculator::trim(std::string str) {
-    char* str_new = new char[str.length()+1];
-    char* p_new = str_new;
+char *Calculator::trim(std::string str) {
+    char *str_new = new char[str.length() + 1];
+    char *p_new = str_new;
 
-    for(std::string::iterator c = str.begin(); c != str.end(); c++) {
-        if(isspace(*c)) continue;
+    for (std::string::iterator c = str.begin(); c != str.end(); c++) {
+        if (isspace(*c)) continue;
 
-        if(*c == ',') *p_new = '.';
+        if (*c == ',') *p_new = '.';
         else *p_new = *c;
         p_new++;
     }
@@ -89,7 +85,7 @@ double Calculator::calculate(std::string str) {
 }
 
 int Calculator::priority(const char c) {
-    switch(c) {
+    switch (c) {
         case '+':
         case '-':
             return 1;
@@ -106,17 +102,18 @@ int Calculator::priority(const char c) {
 double Calculator::act(double op1, char op, double op2) {
     switch (op) {
         case '+':
-            return op1+op2;
+            return op1 + op2;
         case '-':
-            return op1-op2;
+            return op1 - op2;
         case '*':
-            return op1*op2;
+            return op1 * op2;
         case '/':
-            if(std::fpclassify(op2) == FP_ZERO) {
+            if (std::fpclassify(op2) == FP_ZERO) {
                 throw std::runtime_error("division by zero");
             }
-            return op1/op2;
-        default:break;
+            return op1 / op2;
+        default:
+            break;
     }
 
 }
